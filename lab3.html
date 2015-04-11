@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style type="text/css">
+    	h1   { text-align:center }
+  		html { height: 100% }
+	    body { height: 100%; margin: 0; padding: 0 }
+  		#map-canvas { height: 100% }
+
+	</style>
+<script
+src="http://maps.googleapis.com/maps/api/js">
+</script>
+
+<script>
+function doubleClicked(e)
+	{
+		alert("Hi you double-clicked at latitude " + e.latLng.lat() + 
+					" and longitude " + e.latLng.lng() + " :-)");
+
+	}
+function init() {
+  var mapProp = {
+    center:new google.maps.LatLng(34.24, -118.53),
+    zoom:17,
+    mapTypeId:google.maps.MapTypeId.ROADMAP,
+    disableDoubleClickZoom: true,
+	disableDefaultUI: true,
+	zoomControl: false,
+	draggable: false
+  };
+  var map=new google.maps.Map(document.getElementById("map-canvas"), mapProp);
+  google.maps.event.addListener(map, 'dblclick', doubleClicked);
+}
+window.addEventListener("load", init, false); 
+//google.maps.event.addDomListener(window, 'load', initialize);
+</script>
+</head>
+
+<body>
+  <div id = "quiz">My Quiz</div>
+  <div id="map-canvas" ></div>
+</body>
+</html>
