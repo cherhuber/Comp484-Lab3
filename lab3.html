@@ -5,7 +5,9 @@
     	h1   { text-align:center }
   		html { height: 100% }
 	    body { height: 100%; margin: 0; padding: 0 }
-  		#map-canvas { height: 100% }
+  		#map-canvas { 
+  			width:800px;
+  			height:600px;}
 
 	</style>
 <script
@@ -20,16 +22,47 @@ function doubleClicked(e)
 
 	}
 function init() {
+  var myStyle = [
+       {
+         featureType: "administrative",
+         elementType: "labels",
+         stylers: [
+           { visibility: "off" }
+         ]
+       },{
+         featureType: "poi",
+         elementType: "labels",
+         stylers: [
+           { visibility: "off" }
+         ]
+       },{
+         featureType: "water",
+         elementType: "labels",
+         stylers: [
+           { visibility: "off" }
+         ]
+       },{
+         featureType: "road",
+         elementType: "labels",
+         stylers: [
+           { visibility: "on" }
+         ]
+       }
+     ];
   var mapProp = {
+    mapTypeControlOptions: {
+         mapTypeIds: ['mystyle', google.maps.MapTypeId.ROADMAP, google.maps.MapTypeId.TERRAIN]
+       },
     center:new google.maps.LatLng(34.24, -118.53),
     zoom:17,
-    mapTypeId:google.maps.MapTypeId.ROADMAP,
+    mapTypeId:'mystyle',
     disableDoubleClickZoom: true,
-	disableDefaultUI: true,
-	zoomControl: false,
-	draggable: false
+	  disableDefaultUI: true,
+	  zoomControl: false,
+	  draggable: false
   };
   var map=new google.maps.Map(document.getElementById("map-canvas"), mapProp);
+  map.mapTypes.set('mystyle', new google.maps.StyledMapType(myStyle, { name: 'My Style' }));
   google.maps.event.addListener(map, 'dblclick', doubleClicked);
 }
 window.addEventListener("load", init, false); 
@@ -38,7 +71,9 @@ window.addEventListener("load", init, false);
 </head>
 
 <body>
-  <div id = "quiz">My Quiz</div>
-  <div id="map-canvas" ></div>
+  <div>
+  	<div id = "quiz">My Quiz</div>
+  	<div id="map-canvas" ></div>
+  </div>
 </body>
 </html>
