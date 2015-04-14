@@ -6,8 +6,19 @@
   		html { height: 100% }
 	    body { height: 100%; margin: 0; padding: 0 }
   		#map-canvas { 
-  			width:800px;
-  			height:600px;}
+  			width:1000px;
+  			height:600px;
+        float: right;
+      }
+      #wrapper{
+        width:1300px;
+        height:600px;
+      }
+      #quiz{
+        float: left;
+        width: 300px;
+        margin-top: 10px;
+      }
 
 	</style>
 <script
@@ -15,6 +26,7 @@ src="http://maps.googleapis.com/maps/api/js">
 </script>
 
 <script>
+
 function doubleClicked(e)
 	{
 		alert("Hi you double-clicked at latitude " + e.latLng.lat() + 
@@ -25,6 +37,12 @@ function init() {
   var myStyle = [
        {
          featureType: "administrative",
+         elementType: "labels",
+         stylers: [
+           { visibility: "off" }
+         ]
+       },{
+         featureType: "restaurant",
          elementType: "labels",
          stylers: [
            { visibility: "off" }
@@ -53,12 +71,13 @@ function init() {
     mapTypeControlOptions: {
          mapTypeIds: ['mystyle', google.maps.MapTypeId.ROADMAP, google.maps.MapTypeId.TERRAIN]
        },
-    center:new google.maps.LatLng(34.24, -118.53),
+    center:new google.maps.LatLng(34.239570, -118.528330),
     zoom:17,
     mapTypeId:'mystyle',
     disableDoubleClickZoom: true,
 	  disableDefaultUI: true,
 	  zoomControl: false,
+    scrollwheel: false,
 	  draggable: false
   };
   var map=new google.maps.Map(document.getElementById("map-canvas"), mapProp);
@@ -71,8 +90,11 @@ window.addEventListener("load", init, false);
 </head>
 
 <body>
-  <div>
-  	<div id = "quiz">My Quiz</div>
+  <div id = "wrapper">
+  	<div id = "quiz">
+      <p id - "qTitle">CSUN Map Quiz</p>
+      <p id - "qQuestion"></p>
+    </div>
   	<div id="map-canvas" ></div>
   </div>
 </body>
