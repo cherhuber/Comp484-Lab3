@@ -2,139 +2,184 @@
 <html>
 <head>
 <style type="text/css">
-    	h1   { text-align:center }
-  		html { height: 100% }
-	    body { height: 100%; margin: 0; padding: 0 }
-  		#map-canvas { 
-  			width:1000px;
-  			height:600px;
-        float: right;
-      }
-      #wrapper{
-        width:1300px;
-        height:600px;
-      }
-      #quiz{
-        float: left;
-        width: 300px;
-        margin-top: 10px;
-      }
-
-	</style>
+	h1   { text-align:center }
+	html { height: 100% }
+   body { height: 100%; margin: 0; padding: 0 }
+	#wrapper{
+      width:1300px;
+      height:600px;
+      margin: 10px;
+   }
+   #map-canvas { 
+      width:1000px;
+      height:600px;
+      float: right;
+   }
+   #quiz{
+      float: left;
+      width: 300px;
+      margin-top: 10px;
+   }
+   #lastQResult,#result{
+      font-size: small;
+   }
+</style>
 <script src="http://maps.googleapis.com/maps/api/js"></script>
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
 
-<script>
-$(document).ready(function(){
-  var qQuestions = [
-  "Where is Parking Structure B5?",
-  "What building is financial aid located in?",
-  "Where is Jacaranda Hall?",
-  "Where can you buy discounted theme park tickets?",
-  "Where is Oviatt Library?"
-];
-  $("#qQuestions").html(qQuestions[0]);
-    
-});
+<script type="text/javascript">
+   var qQuestions = [
+      "1)  Where is Jacaranda Hall?",
+      "2)  Where is Parking Structure B5?",
+      "3)  What building is financial aid located in?",
+      "4)  Where can you buy discounted theme park tickets?",
+      "5)  Where is Oviatt Library?"
+   ];
+   var i = 0;//counter for questions
+   var map;
+   var numberCorrect = 0;
+   var quizDone = false;
+  //bounds for Rectangles
+   var myBounds = new Array();
+   myBounds[0] = new google.maps.LatLngBounds(
+      new google.maps.LatLng(34.2410404129262, -118.529444932937),
+      new google.maps.LatLng(34.2420603750996, -118.527846336364));
+   myBounds[1] = new google.maps.LatLngBounds(
+      new google.maps.LatLng(34.2412355370806, -118.53327512741),
+      new google.maps.LatLng(34.2419007296622, -118.531912565231));
+   myBounds[2] = new google.maps.LatLngBounds(
+      new google.maps.LatLng(34.23989626673768, -118.531419038772),
+      new google.maps.LatLng(34.2406945099045, -118.53012084960938));
+   myBounds[3] = new google.maps.LatLngBounds(
+      new google.maps.LatLng(34.2397987031648, -118.52668762207),
+      new google.maps.LatLng(34.2406767712497, -118.525282144546));
+   myBounds[4] = new google.maps.LatLngBounds(
+      new google.maps.LatLng(34.23963018399997, -118.53001356124878),
+      new google.maps.LatLng(34.2403840829057, -118.528629541397));
 
-function doubleClicked(e)
-	{
-		alert("Hi you double-clicked at latitude " + e.latLng.lat() + 
-					" and longitude " + e.latLng.lng() + " :-)");
+   $( document ).ready(
+      function init() {//initializes page with map and quiz section
+         var myStyle = [//removes labels from google  map
+              {
+                featureType: "administrative",
+                elementType: "labels",
+                stylers: [
+                  { visibility: "off" }
+                ]
+              },{
+                featureType: "restaurant",
+                elementType: "labels",
+                stylers: [
+                  { visibility: "off" }
+                ]
+              },{
+                featureType: "poi",
+                elementType: "labels",
+                stylers: [
+                  { visibility: "off" }
+                ]
+              },{
+                featureType: "water",
+                elementType: "labels",
+                stylers: [
+                  { visibility: "off" }
+                ]
+              },{
+                featureType: "road",
+                elementType: "labels",
+                stylers: [
+                  { visibility: "on" }
+                ]
+              }
+         ];
+      
+         var mapProp = {//options for map
+            mapTypeControlOptions: {
+               mapTypeIds: ['mystyle', google.maps.MapTypeId.ROADMAP, google.maps.MapTypeId.TERRAIN]
+            },
+            center:new google.maps.LatLng(34.239570, -118.528330),
+            zoom:17,
+            mapTypeId:'mystyle',
+            disableDoubleClickZoom: true,
+            disableDefaultUI: true,
+            zoomControl: false,
+            scrollwheel: false,
+            draggable: false
+         };
+      map=new google.maps.Map(document.getElementById("map-canvas"), mapProp);//creates map
+   //applies style to map   
+      map.mapTypes.set('mystyle', new google.maps.StyledMapType(myStyle, { name: 'My Style' }));
+      
+      displayQuestions(i);
+      google.maps.event.addListener(map, 'dblclick', doubleClicked);
 
-	}
-function addRects(bounds, map, rColor, qNum){
-    for (var i=0; i<bounds.length; ++i) {
-      var overlay = new google.maps.Rectangle({
-          map: map,
-          bounds: bounds[qNum],
-          strokeColor: rColor,
-          strokeWeight: 1,
-          fillOpacity:0
-        });
-    }
-}
-function init() {
-  var myStyle = [
-       {
-         featureType: "administrative",
-         elementType: "labels",
-         stylers: [
-           { visibility: "off" }
-         ]
-       },{
-         featureType: "restaurant",
-         elementType: "labels",
-         stylers: [
-           { visibility: "off" }
-         ]
-       },{
-         featureType: "poi",
-         elementType: "labels",
-         stylers: [
-           { visibility: "off" }
-         ]
-       },{
-         featureType: "water",
-         elementType: "labels",
-         stylers: [
-           { visibility: "off" }
-         ]
-       },{
-         featureType: "road",
-         elementType: "labels",
-         stylers: [
-           { visibility: "on" }
-         ]
-       }
-     ];
-//bounds for Rectangles
-  var myBounds = new Array();
-    myBounds[0] = new google.maps.LatLngBounds(
-            new google.maps.LatLng(34.2420603750996, -118.529444932937),
-            new google.maps.LatLng(34.2410404129262, -118.527846336364));
+   }//init
+   );//document.ready
 
-    myBounds[1] = new google.maps.LatLngBounds(
-            new google.maps.LatLng(34.2419007296622, -118.53327512741),
-            new google.maps.LatLng(34.2412355370806, -118.531912565231));
-    myBounds[2] = new google.maps.LatLngBounds(
-            new google.maps.LatLng(34.2406945099045, -118.531419038772),
-            new google.maps.LatLng(34.23989626673768, -118.53012084960938));
-    myBounds[3] = new google.maps.LatLngBounds(
-            new google.maps.LatLng(34.2406767712497, -118.52668762207),
-            new google.maps.LatLng(34.2397987031648, -118.525282144546));
-    myBounds[4] = new google.maps.LatLngBounds(
-            new google.maps.LatLng(34.2403840829057, -118.53001356124878),
-            new google.maps.LatLng(34.23963018399997, -118.528629541397));
-  
-  var mapProp = {
-    mapTypeControlOptions: {
-         mapTypeIds: ['mystyle', google.maps.MapTypeId.ROADMAP, google.maps.MapTypeId.TERRAIN]
-       },
-    center:new google.maps.LatLng(34.239570, -118.528330),
-    zoom:17,
-    mapTypeId:'mystyle',
-    disableDoubleClickZoom: true,
-	  disableDefaultUI: true,
-	  zoomControl: false,
-    scrollwheel: false,
-	  draggable: false
-  };
-  var map=new google.maps.Map(document.getElementById("map-canvas"), mapProp);
-  map.mapTypes.set('mystyle', new google.maps.StyledMapType(myStyle, { name: 'My Style' }));
-  google.maps.event.addListener(map, 'dblclick', doubleClicked);
-  addRects(myBounds, map, "green",1);
-}
-window.addEventListener("load", init, false); 
-//google.maps.event.addDomListener(window, 'load', initialize);
+   function doubleClicked(e){//registers dbl click, displays rectangle accordingly and updates results
+      const max = 5;//max questions
+      if(!quizDone){
+         if (myBounds[i].contains(e.latLng)){
+            addRects(myBounds, map, "green",i);
+            numberCorrect++;
+            $( "#lastQResult").text("Question " + (i+1) + " was answered correctly :-)");
+         }else{
+            addRects(myBounds, map, "red",i);
+            $( "#lastQResult").text("Question " + (i+1) + " was answered correctly :-(");
+         }
+         $( "#result").text("# correct: " + numberCorrect + " out of "+max);
+         i++;
+         if(i<max){//test after increment
+            displayQuestions(i); 
+         }else{
+            var myString = "You scored " + numberCorrect + " out of a <br/>possible "+max+" correct!";
+            //$( "#aResult").text("You scored " + numberCorrect + " out of a possible "+max+" correct!");
+            $( "#aResult").html(myString);
+            animateResult();
+            quizDone=true;//renders double click useless
+         }//else 
+      }//if quizDone    
+   }//doubleClicked
+   function displayQuestions(qNum){
+      $( "#qQuestion" ).text(qQuestions[qNum]);
+   }
+   function animateResult(){//animation of quiz result
+      $( "#aResult").css("color", "red");
+      $( "#aResult").animate({
+            fontSize: '2em',
+            height: '+=150px',
+            width: '+=150px',
+            marginTop: "+=30px"
+         });
+      $( "#aResult").slideUp( "slow");
+      $( "#aResult").slideDown( "slow");
+   }
+   function addRects(bounds, map, rColor, qNum){//function to add rectangles to map
+      for (var i=0; i<bounds.length; ++i) {
+         var overlay = new google.maps.Rectangle({
+         map: map,
+         bounds: bounds[qNum],
+         strokeColor: rColor,
+         strokeWeight: 1,
+         fillOpacity:0
+         });
+      }//for
+   }//addRects
 </script>
 </head>
 
 <body>
   <div id = "wrapper">
   	<div id = "quiz">
-      <p id - "qTitle">CSUN Map Quiz</p>
-      <p id - "qQuestion"></p>
+      <p id = "qTitle">
+         <h1>CSUN Map Quiz</h1>
+         <h3>There are 5 questions.  Answer by double clicking on the map.</h3>
+      </p>
+      <p id = "qQuestion"></p>
+      <br/>
+      <div id = "lastQResult"></div>
+      <div id = "result"></div>
+      <div id = "aResult"></div>
     </div>
   	<div id="map-canvas" ></div>
   </div>
