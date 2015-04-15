@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style type="text/css">
+    	h1   { text-align:center }
+  		html { height: 100% }
+	    body { height: 100%; margin: 0; padding: 0 }
+  		#map-canvas { 
+  			width:1000px;
+  			height:605px;
+        float: right;
+        margin-top: -50px;
+      }
+      #wrapper{
+        width:1300px;
+        height:600px;
+      }
+      #quiz{
+        float: left;
+        width: 300px;
+        margin-top: 5px;
+        margin-left: 10px;
+      }
+
+	</style>
+<script src="http://maps.googleapis.com/maps/api/js"></script>
+<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+
+<script type="text/javascript">
+  var qQuestions = [
+    "Where is Parking Structure B5?",
+    "What building is financial aid located in?",
+    "Where is Jacaranda Hall?",
+    "Where can you buy discounted theme park tickets?",
+    "Where is Oviatt Library?"
+  ];
+  //bounds for Rectangles
+  var myBounds = new Array();
+    myBounds[0] = new google.maps.LatLngBounds(
+            new google.maps.LatLng(34.2420603750996, -118.529444932937),
+            new google.maps.LatLng(34.2410404129262, -118.527846336364));
+
+    myBounds[1] = new google.maps.LatLngBounds(
+            new google.maps.LatLng(34.2419007296622, -118.53327512741),
+            new google.maps.LatLng(34.2412355370806, -118.531912565231));
+    myBounds[2] = new google.maps.LatLngBounds(
+            new google.maps.LatLng(34.2406945099045, -118.531419038772),
+            new google.maps.LatLng(34.23989626673768, -118.53012084960938));
+    myBounds[3] = new google.maps.LatLngBounds(
+            new google.maps.LatLng(34.2406767712497, -118.52668762207),
+            new google.maps.LatLng(34.2397987031648, -118.525282144546));
+    myBounds[4] = new google.maps.LatLngBounds(
+            new google.maps.LatLng(34.2403840829057, -118.53001356124878),
+            new google.maps.LatLng(34.23963018399997, -118.528629541397));
+
+  $( document ).ready(
+    function init() {
+      var myStyle = [
+           {
+             featureType: "administrative",
+             elementType: "labels",
+             stylers: [
+               { visibility: "off" }
+             ]
+           },{
+             featureType: "restaurant",
+             elementType: "labels",
+             stylers: [
+               { visibility: "off" }
+             ]
+           },{
+             featureType: "poi",
+             elementType: "labels",
+             stylers: [
+               { visibility: "off" }
+             ]
+           },{
+             featureType: "water",
+             elementType: "labels",
+             stylers: [
+               { visibility: "off" }
+             ]
+           },{
+             featureType: "road",
+             elementType: "labels",
+             stylers: [
+               { visibility: "on" }
+             ]
+           }
+         ];
+      
+      var mapProp = {
+        mapTypeControlOptions: {
+             mapTypeIds: ['mystyle', google.maps.MapTypeId.ROADMAP, google.maps.MapTypeId.TERRAIN]
+           },
+        center:new google.maps.LatLng(34.239570, -118.528330),
+        zoom:17,
+        mapTypeId:'mystyle',
+        disableDoubleClickZoom: true,
+        disableDefaultUI: true,
+        zoomControl: false,
+        scrollwheel: false,
+        draggable: false
+      };
+      var map=new google.maps.Map(document.getElementById("map-canvas"), mapProp);
+      map.mapTypes.set('mystyle', new google.maps.StyledMapType(myStyle, { name: 'My Style' }));
+      var i = 0;
+      $( "#qQuestion" ).text(qQuestions[i]);
+      google.maps.event.addListener(map, 'dblclick', doubleClicked);
+           
+  }//init
+  );//document.ready
+
+  
+
+  function doubleClicked(e){
+      alert("Hi you double-clicked at latitude " + e.latLng.lat() + 
+            " and longitude " + e.latLng.lng() + " :-)");
+
+    }
+  function addRects(bounds, map, rColor, qNum){
+      for (var i=0; i<bounds.length; ++i) {
+        var overlay = new google.maps.Rectangle({
+            map: map,
+            bounds: bounds[qNum],
+            strokeColor: rColor,
+            strokeWeight: 1,
+            fillOpacity:0
+          });
+      }
+  }
+</script>
+</head>
+
+<body>
+  <div id = "wrapper">
+  	<div id = "quiz">
+      <p id = "qTitle">CSUN Map Quiz</p>
+      <p id = "qQuestion"></p>
+      <br>
+      <button id="nextQ">Next Question</button>
+    </div>
+  	<div id="map-canvas" ></div>
+  </div>
+</body>
+</html>
